@@ -2,6 +2,16 @@ import os
 import sys
 import time
 import random
+import argparse
+
+
+
+# Criando um parser para receber os parâmetros via linha de comando
+
+parser = argparse.ArgumentParser(description="Realiza a conexão com o jogo")
+parser.add_argument('--host', type=str, help='Indica o host')
+parser.add_argument('--porta', type=str, help='Indica a porta do servidor')
+args = parser.parse_args()
 
 ##
 # Funcoes uteis
@@ -224,6 +234,7 @@ def leCoordenada(dim):
 dim = 4
 
 # Numero de jogadores
+# Criar uma forma do servidor mandar o número de jogadores
 nJogadores = 2
 
 # Numero total de pares de pecas
@@ -323,6 +334,7 @@ for i in range(0, nJogadores):
     if placar[i] == pontuacaoMaxima:
         vencedores.append(i)
 
+print(args)
 if len(vencedores) > 1:
 
     sys.stdout.write("Houve empate entre os jogadores ")
