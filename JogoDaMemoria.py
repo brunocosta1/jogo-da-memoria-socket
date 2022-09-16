@@ -129,6 +129,7 @@ def abrePeca(tabuleiro, i, j):
         return False
     elif tabuleiro[i][j] < 0:
         tabuleiro[i][j] = -tabuleiro[i][j]
+        # Envia para o servidor
         return True
 
     return False
@@ -240,6 +241,7 @@ nJogadores = 2
 # Numero total de pares de pecas
 totalDePares = dim**2 / 2
 
+#Lógica do jogo (deve ir para o servidor)
 ##
 # Programa principal
 ##
@@ -306,6 +308,7 @@ while paresEncontrados < totalDePares:
     print ("Pecas escolhidas --> ({0}, {1}) e ({2}, {3})\n".format(i1, j1, i2, j2))
 
     # Pecas escolhidas sao iguais?
+    #Servidor
     if tabuleiro[i1][j1] == tabuleiro[i2][j2]:
 
         print ("Pecas casam! Ponto para o jogador {0}.".format(vez + 1))
@@ -334,7 +337,6 @@ for i in range(0, nJogadores):
     if placar[i] == pontuacaoMaxima:
         vencedores.append(i)
 
-print(args)
 if len(vencedores) > 1:
 
     sys.stdout.write("Houve empate entre os jogadores ")
