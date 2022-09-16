@@ -1,12 +1,18 @@
 import socket
 import sys
 import os
-from threading import Thread
 from random import randint
 from datetime import datetime
 
+import argparse
+
+parser = argparse.ArgumentParser(description='Player que vai se conectar com o servidor do jogo')
+parser.add_argument('--porta', type=int, help='Indica em que porta vai se conectar')
+parser.add_argument('--host', type=str, help='Indica qual vai ser o host')
+args = parser.parse_args()
+PORT = args.porta
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("", 9803))
+client.connect(("", 8000))
 
 id = randint(0, 10)
 
@@ -36,5 +42,3 @@ def send():
 
 clear()
 
-Thread(target = receive).start()
-Thread(target = send).start()
