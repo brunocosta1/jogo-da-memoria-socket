@@ -1,3 +1,4 @@
+import pickle
 import socket
 import sys
 import os
@@ -50,9 +51,26 @@ def clear():
 #
 # send()
 
+def limpaTela():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def recebeDadosJogo(client):
+    datajogo = client.recv(1024)
+    datajogo = pickle.loads(datajogo)
+    return datajogo
+
 def main():
     args = getArgs()
     client = connect(args.host, args.porta)
+
+    limpaTela()
+    print("Aguardando os jogadores se conectarem para o início do jogo")
+    jogo = recebeDadosJogo(client)
+
+
+    print(jogo)
+
+
     client.close()
 
 if __name__ == "__main__":
