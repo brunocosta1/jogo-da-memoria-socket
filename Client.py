@@ -6,39 +6,55 @@ from datetime import datetime
 
 import argparse
 
-parser = argparse.ArgumentParser(description='Player que vai se conectar com o servidor do jogo')
-parser.add_argument('--porta', type=int, help='Indica em que porta vai se conectar')
-parser.add_argument('--host', type=str, help='Indica qual vai ser o host')
-args = parser.parse_args()
-PORT = args.porta
-client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client.connect(("", 8000))
+def getArgs():
+    parser = argparse.ArgumentParser(description='Player que vai se conectar com o servidor do jogo')
+    parser.add_argument('--porta', type=int, help='Indica em que porta vai se conectar')
+    parser.add_argument('--host', type=str, help='Indica qual vai ser o host')
+    args = parser.parse_args()
+    return args
+
+
+
+def connect(HOST: str, PORT):
+    print("Conectando...")
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect((HOST, PORT))
+    print("Conetado!")
+    return client
 
 id = randint(0, 10)
 
 def clear():
     os.system("cls" if os.name == "nt" else "clear")
 
-def receive():
-    log = ""
-    while True:
-        try:
-            msg = client.recv(1024).decode("utf-8")
-            clear()
-            log = log + f"\n{msg}"
-            print(log)
-        except:
-            client.close()
-            sys.exit(0)
+# def receive():
+#     log = ""
+#     while True:
+#         try:
+#             msg = client.recv(1024).decode("utf-8")
+#             clear()
+#             log = log + f"\n{msg}"
+#             print(log)
+#         except:
+#             client.close()
+#             sys.exit(0)
+#
+# def send():
+#     while True:
+#         msg = input()
+#         clear()
+#         if(msg == "\quit"):
+#             client.close()
+#             sys.exit(0)
+#         client.send("[{}] {}: {}".format(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), id, msg).encode("utf-8"))
+#
+# send()
 
-def send():
-    while True:
-        msg = input()
-        clear()
-        if(msg == "\quit"):
-            client.close()
-            sys.exit(0)
-        client.send("[{}] {}: {}".format(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), id, msg).encode("utf-8"))
+def main():
+    args = getArgs()
+    client = connect(args.host, args.porta)
+    client.close()
 
-clear()
+if __name__ == "__main__":
+    main()
 
