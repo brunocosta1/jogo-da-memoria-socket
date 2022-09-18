@@ -15,11 +15,11 @@ def getArgs():
 
 
 
-def connect(HOST: str, PORT):
+def connect(HOST: str, PORT: int):
     print("Conectando...")
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((HOST, PORT))
-    print("Conetado!")
+    print("Conectado!")
     return client
 
 id = randint(0, 10)
