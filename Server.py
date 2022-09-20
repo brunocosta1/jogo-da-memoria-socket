@@ -2,6 +2,7 @@ import pickle
 import socket
 import argparse
 import random
+from time import sleep
 from typing import List
 
 def getArgs():
@@ -29,7 +30,7 @@ def conexaoJogadores(HOST, PORT, numeroJogadores):
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((HOST, PORT))
-    server.listen()
+    server.listen(numeroJogadores)
     while len(users) < numeroJogadores:
         client, address = server.accept()
         users.append(client)
@@ -104,22 +105,91 @@ def criaJogo(numeroJogadores):
     return dados
 
 def enviaDadosJogo(jogo, users):
-    dados = pickle.dumps(jogo)
+    print("Enviando dados do jogo...")
+    i = 0
     for user in users:
+        dados = pickle.dumps((jogo, i))
         user.send(dados)
+        i += 1
 
-def iniciaJogo():
-    pass
+def enviaDados(user, dado):
+    dado_serializado = pickle.dumps(dado)
+    user.send(dado_serializado)
+
+def recebeDados(user):
+    dado_serializado = user.recv(1024)
+    dado = pickle.loads(dado_serializado)
+    return dado
+
+
+def abrePeca(tabuleiro, i, j):
+
+    if tabuleiro[i][j] == '-':
+        return False
+    elif tabuleiro[i][j] < 0:
+        tabuleiro[i][j] = -tabuleiro[i][j]
+        # Envia para o servidor
+        return True
+
+    return False
+
+def recebeJogada(user: socket.socket, jogo):
+    while True:
+        jogada = recebeDados(user)
+
+        if jogada == False:
+            continue
+
+        i1, j1 = jogada
+
+        if abrePeca(jogo["tabuleiro"], i1, j1) == False:
+            msg = "Escolha uma peça ainda fechada!"
+            user.send(pickle.dumps(msg))
+            continue
+        break
+
+    while True:
+        jogada = recebeDados(user)
+
+        if jogada == False:
+            continue
+
+        i2, j2 = jogada
+         
+        if abrePeca(jogo["tabuleiro"], i2, j2) == False:
+            msg = "Escolha uma peça ainda fechada!"
+            enviaDados(user, msg)
+            continue
+        break
+
+    return jogada
+    
+
+def iniciaJogo(jogo, users):
+    while jogo["paresEncontrados"] < jogo["numeroPares"]:
+        jogadorVez = jogo["vez"]
+        jogada = recebeJogada(users[jogadorVez], jogo)
+
+        if jogada == False:
+            continue
+
+        i1, j1 = jogada
+
 
 def main():
     args = getArgs()
     users, server = conexaoJogadores(args.host, args.porta, args.numero)
-    jogo = criaJogo(args.numero)
 
-    enviaDadosJogo(jogo, users)
+    try:
+        jogo = criaJogo(args.numero)
+
+        enviaDadosJogo(jogo, users)
+        fechaConexao(users, server)
+    except:
+        fechaConexao(users, server)
+        print("saindo...")
 
 
-    fechaConexao(users, server)
 
 
 if __name__ == "__main__":
