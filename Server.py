@@ -2,7 +2,6 @@ import pickle
 import socket
 import argparse
 import random
-from time import sleep
 from typing import List
 
 def getArgs():
