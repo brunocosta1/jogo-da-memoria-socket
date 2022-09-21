@@ -201,7 +201,7 @@ def iniciaJogo(ID, user: socket.socket, jogo):
         imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
         print(f"Peças escolhidas --> ({x1}, {y1}) e ({x2}, {y2})")
         if validadeJogada == True:
-            print(f"Peças casam! Ponto para o jogador {jogo['vez']}")
+            print(f"Peças casam! Ponto para o jogador {jogo['vez'] + 1}")
             time.sleep(5)
         else:
             print("Peças não casam!")
