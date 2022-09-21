@@ -249,19 +249,32 @@ def atualizaTabuleiro(tabuleiro, jogada):
 def enviaDadosParaTodosExcetoUm(users, vez, dado):
     dado_serializado = pickle.dumps(dado)
     i = 0
+    print(f"Enviando dados para todos exceto: {vez}")
     for user in users:
         if i != vez:
             user.send(dado_serializado)
         i += 1
          
+def verificaVencedores(placar, numeroJogadores):
+    vencedores = []
+    pontuacaoMaxima = max(placar)
+    for i in range(0, numeroJogadores):
+        if placar[i] == pontuacaoMaxima:
+            vencedores.append(i)
+    return vencedores
 
 
 def iniciaJogo2(jogo, users):
     while jogo["paresEncontrados"] < jogo["numeroPares"]:
         print("Aguardando coordenada 1...")
         coordenada1 = recebeDados(users[jogo["vez"]])
+        enviaDadosParaTodosExcetoUm(users, jogo["vez"], coordenada1)
+        time.sleep(0.5)
+
         print("Aguardando coordenada 2...")
         coordenada2 = recebeDados(users[jogo["vez"]])
+        enviaDadosParaTodosExcetoUm(users, jogo["vez"], coordenada2)
+        time.sleep(0.5)
 
         jogada = (coordenada1, coordenada2)
         validadeJogada = verificaJogada(jogo["tabuleiro"], jogada)
@@ -278,6 +291,11 @@ def iniciaJogo2(jogo, users):
 
         enviaDadosParaTodos(users, jogo)
 
+    time.sleep(0.25)
+    vencedores = verificaVencedores(jogo["placar"], jogo["numeroJogadores"])
+    print("Jogo encerrado...")
+    enviaDadosParaTodos(users, vencedores)
+
 def main():
     args = getArgs()
     if args.dimensao % 2 == 1 or args.dimensao > 10:
@@ -287,6 +305,7 @@ def main():
 
     jogo = criaJogo(args.numero, args.dimensao)
     try:
+        print(jogo)
         enviaDadosJogo(jogo, users)
 
         iniciaJogo2(jogo, users)

@@ -138,8 +138,6 @@ def abrePeca(tabuleiro, i, j):
 
     return False
 
-def renderiza(jogo):
-    pass
 
 def iniciaJogo(ID, user: socket.socket, jogo):
     while(jogo["paresEncontrados"] < jogo["numeroPares"]):
@@ -162,6 +160,7 @@ def iniciaJogo(ID, user: socket.socket, jogo):
                 break
 
             enviaDados(user, coordenada1)
+            time.sleep(0.5)
             # Lendo coordenada2
             while True:
                 imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
@@ -178,8 +177,21 @@ def iniciaJogo(ID, user: socket.socket, jogo):
                     continue
 
                 break
-
             enviaDados(user, coordenada2)
+            time.sleep(0.5)
+        else:
+            imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
+            coordenada1 = recebeDados(user)
+            i1, j1 = coordenada1 
+            abrePeca(jogo["tabuleiro"], i1, j1)
+            time.sleep(0.5)
+
+            imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
+            coordenada2 = recebeDados(user)
+            i2, j2 = coordenada2 
+            abrePeca(jogo["tabuleiro"], i2, j2)
+            time.sleep(0.5)
+
 
         imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
         jogada, validadeJogada = recebeDados(user)
@@ -201,9 +213,17 @@ def iniciaJogo(ID, user: socket.socket, jogo):
 
         jogo = recebeDados(user)
 
+    time.sleep(0.25)
+    vencedores = recebeDados(user)
 
+    if len(vencedores) > 1:
+        sys.stdout.write("Houve empate entre os jogadores ")
+        for i in vencedores:
+            sys.stdout.write(str(i + 1) + ' ')
 
-        
+        sys.stdout.write("\n")
+    else:
+        print(f"Jogador {vencedores[0] + 1} foi o vencedor")
 
 def main():
     args = getArgs()
@@ -212,15 +232,17 @@ def main():
     limpaTela()
     print("Aguardando os jogadores se conectarem para o início do jogo")
 
-    # jogador recebe dados do jogo do servidor e um identificador
-    jogo, identificador = recebeDados(client)
-    print(jogo)
-    print(identificador)
-    # jogador recebe uma identificação
-    iniciaJogo(identificador, client, jogo)
-    client.close()
-    print("Saindo...")
-    client.close()
+    try:
+        # jogador recebe dados do jogo do servidor e um identificador
+        jogo, identificador = recebeDados(client)
+        print(jogo)
+        print(identificador)
+        # jogador recebe uma identificação
+        iniciaJogo(identificador, client, jogo)
+        client.close()
+    except:
+        print("Saindo...")
+        client.close()
 
 
 if __name__ == "__main__":
