@@ -2,6 +2,7 @@ import pickle
 import socket
 import argparse
 import random
+import sys
 import time
 from typing import List, Tuple
 
@@ -266,6 +267,9 @@ def iniciaJogo2(jogo, users):
 
 def main():
     args = getArgs()
+    if args.dimensao % 2 == 1 or args.dimensao > 10:
+        print("Erro no argumento --dimensao")
+        sys.exit(-1)
     users, server = conexaoJogadores(args.host, args.porta, args.numero)
 
     try:
