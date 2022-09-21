@@ -218,8 +218,10 @@ def verificaJogada(tabuleiro, jogada):
     x2, y2 = coordenada2
 
     if tabuleiro[x1][y1] == tabuleiro[x2][y2]:
+        print("jogada certa!")
         return True
     else:
+        print("jogada errada!")
         return False
 
 def enviaDadosParaTodos(users: List[socket.socket], dado):
@@ -235,12 +237,23 @@ def atualizaTabuleiro(tabuleiro, jogada):
     if tabuleiro[x1][y1] == '-':
         return False
     else:
-        tabuleiro[x1][y1] = '-'
+        tabuleiro[x1][y1] = "-"
 
     if tabuleiro[x2][y2] == '-':
         return False
     else:
-        tabuleiro[x2][y2] = '-'
+        tabuleiro[x2][y2] = "-"
+
+
+
+def enviaDadosParaTodosExcetoUm(users, vez, dado):
+    dado_serializado = pickle.dumps(dado)
+    i = 0
+    for user in users:
+        if i != vez:
+            user.send(dado_serializado)
+        i += 1
+         
 
 
 def iniciaJogo2(jogo, users):
@@ -255,7 +268,7 @@ def iniciaJogo2(jogo, users):
 
         enviaDadosParaTodos(users, (jogada, validadeJogada))
         if validadeJogada:
-            atualizaTabuleiro(jogo, jogada)
+            atualizaTabuleiro(jogo["tabuleiro"], jogada)
             atualizaPlacar(jogo)
             jogo["paresEncontrados"] += 1
             time.sleep(5)
@@ -272,16 +285,18 @@ def main():
         sys.exit(-1)
     users, server = conexaoJogadores(args.host, args.porta, args.numero)
 
+    jogo = criaJogo(args.numero, args.dimensao)
     try:
-        jogo = criaJogo(args.numero, args.dimensao)
         enviaDadosJogo(jogo, users)
 
         iniciaJogo2(jogo, users)
 
         fechaConexao(users, server)
-    except:
+        
+    except Exception as e:
         print("Saindo...")
         fechaConexao(users, server)
+        raise e
 
 if __name__ == "__main__":
     main()

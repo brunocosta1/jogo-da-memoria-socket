@@ -213,16 +213,14 @@ def main():
     print("Aguardando os jogadores se conectarem para o início do jogo")
 
     # jogador recebe dados do jogo do servidor e um identificador
-    try:
-        jogo, identificador = recebeDados(client)
-        print(jogo)
-        print(identificador)
-        # jogador recebe uma identificação
-        iniciaJogo(identificador, client, jogo)
-        client.close()
-    except:
-        print("Saindo...")
-        client.close()
+    jogo, identificador = recebeDados(client)
+    print(jogo)
+    print(identificador)
+    # jogador recebe uma identificação
+    iniciaJogo(identificador, client, jogo)
+    client.close()
+    print("Saindo...")
+    client.close()
 
 
 if __name__ == "__main__":
