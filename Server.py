@@ -218,7 +218,6 @@ def main():
 
     jogo = criaJogo(args.numero, args.dimensao)
     try:
-        print(jogo)
         enviaDadosIniciaisJogo(jogo, users)
 
         iniciaJogo(jogo, users)
