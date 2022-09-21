@@ -88,8 +88,8 @@ def novoPlacar(nJogadores):
 
     return [0] * nJogadores
 
-def criaJogo(numeroJogadores):
-    dim = 4
+def criaJogo(numeroJogadores, dimensao):
+    dim = dimensao 
     totalDePares = dim ** 2 / 2
     tabuleiro = novoTabuleiro(dim)
     placar = novoPlacar(numeroJogadores)
@@ -269,7 +269,7 @@ def main():
     users, server = conexaoJogadores(args.host, args.porta, args.numero)
 
     try:
-        jogo = criaJogo(args.numero)
+        jogo = criaJogo(args.numero, args.dimensao)
         enviaDadosJogo(jogo, users)
 
         iniciaJogo2(jogo, users)
