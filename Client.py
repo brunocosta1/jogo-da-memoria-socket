@@ -2,7 +2,6 @@ import pickle
 import socket
 import sys
 import os
-
 import argparse
 import time
 
@@ -12,8 +11,6 @@ def getArgs():
     parser.add_argument('--host', type=str, help='Indica qual vai ser o host')
     args = parser.parse_args()
     return args
-
-
 
 def connect(HOST: str, PORT: int):
     print("Conectando...")
@@ -142,63 +139,63 @@ def abrePeca(tabuleiro, i, j):
 def iniciaJogo(ID, user: socket.socket, jogo):
     while(jogo["paresEncontrados"] < jogo["numeroPares"]):
         if jogo["vez"] == ID:
-            # Lendo coordenada1
+            # Lendo primeira coordenada 
             while True:
                 imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
-                coordenada1 = leCoordenada(jogo["dimensao"])
+                primeiraCoordenada = leCoordenada(jogo["dimensao"])
 
-                if coordenada1 == False:
+                if primeiraCoordenada == False:
                     continue
                 
-                i1, j1 = coordenada1
+                x1, y1 = primeiraCoordenada
 
-                if abrePeca(jogo["tabuleiro"], i1, j1) == False:
+                if abrePeca(jogo["tabuleiro"], x1, y1) == False:
                     print("Escolha uma peça ainda fechada!")
                     input("Pressiona <enter para continuar...")
                     continue
 
                 break
 
-            enviaDados(user, coordenada1)
+            enviaDados(user, primeiraCoordenada)
             time.sleep(0.5)
-            # Lendo coordenada2
+            # Lendo segunda coordenada
             while True:
                 imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
-                coordenada2 = leCoordenada(jogo["dimensao"])
+                segundaCoordenada = leCoordenada(jogo["dimensao"])
 
-                if coordenada2 == False:
+                if segundaCoordenada == False:
                     continue
                 
-                i2, j2 = coordenada2
+                x2, y2 = segundaCoordenada
 
-                if abrePeca(jogo["tabuleiro"], i2, j2) == False:
+                if abrePeca(jogo["tabuleiro"], x2, y2) == False:
                     print("Escolha uma peça ainda fechada!")
                     input("Pressiona <enter para continuar...")
                     continue
 
                 break
-            enviaDados(user, coordenada2)
+            enviaDados(user, segundaCoordenada)
             time.sleep(0.5)
         else:
             imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
-            coordenada1 = recebeDados(user)
-            i1, j1 = coordenada1 
-            abrePeca(jogo["tabuleiro"], i1, j1)
+            primeiraCoordenada = recebeDados(user)
+            x1, y1 = primeiraCoordenada 
+            abrePeca(jogo["tabuleiro"], x1, y1)
             time.sleep(0.5)
 
             imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
-            coordenada2 = recebeDados(user)
-            i2, j2 = coordenada2 
-            abrePeca(jogo["tabuleiro"], i2, j2)
+            segundaCoordenada = recebeDados(user)
+            x2, y2 = segundaCoordenada 
+            abrePeca(jogo["tabuleiro"], x2, y2)
             time.sleep(0.5)
 
 
         imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
         jogada, validadeJogada = recebeDados(user)
 
-        coordenada1, coordenada2 = jogada
-        x1, y1 = coordenada1
-        x2, y2 = coordenada2
+        primeiraCoordenada, segundaCoordenada = jogada
+        x1, y1 = primeiraCoordenada
+        x2, y2 = segundaCoordenada
 
 
         imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
@@ -220,7 +217,6 @@ def iniciaJogo(ID, user: socket.socket, jogo):
         sys.stdout.write("Houve empate entre os jogadores ")
         for i in vencedores:
             sys.stdout.write(str(i + 1) + ' ')
-
         sys.stdout.write("\n")
     else:
         print(f"Jogador {vencedores[0] + 1} foi o vencedor")
@@ -228,22 +224,18 @@ def iniciaJogo(ID, user: socket.socket, jogo):
 def main():
     args = getArgs()
     client = connect(args.host, args.porta)
-
     limpaTela()
+
     print("Aguardando os jogadores se conectarem para o início do jogo")
 
     try:
-        # jogador recebe dados do jogo do servidor e um identificador
         jogo, identificador = recebeDados(client)
-        print(jogo)
-        print(identificador)
-        # jogador recebe uma identificação
+        time.sleep(0.5)
         iniciaJogo(identificador, client, jogo)
         client.close()
     except:
         print("Saindo...")
         client.close()
-
 
 if __name__ == "__main__":
     main()
