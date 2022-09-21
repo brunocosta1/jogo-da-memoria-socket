@@ -267,15 +267,16 @@ def main():
     args = getArgs()
     users, server = conexaoJogadores(args.host, args.porta, args.numero)
 
-    jogo = criaJogo(args.numero)
-    enviaDadosJogo(jogo, users)
+    try:
+        jogo = criaJogo(args.numero)
+        enviaDadosJogo(jogo, users)
 
-    iniciaJogo2(jogo, users)
+        iniciaJogo2(jogo, users)
 
-    fechaConexao(users, server)
-
-
-
+        fechaConexao(users, server)
+    except:
+        print("Saindo...")
+        fechaConexao(users, server)
 
 if __name__ == "__main__":
     main()
