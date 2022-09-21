@@ -4,6 +4,7 @@ import sys
 import os
 
 import argparse
+import time
 
 def getArgs():
     parser = argparse.ArgumentParser(description='Player que vai se conectar com o servidor do jogo')
@@ -21,39 +22,10 @@ def connect(HOST: str, PORT: int):
     print("Conectado!")
     return c 
 
-
-def clear():
-    os.system("cls" if os.name == "nt" else "clear")
-
-# def receive():
-#     log = ""
-#     while True:
-#         try:
-#             msg = client.recv(1024).decode("utf-8")
-#             clear()
-#             log = log + f"\n{msg}"
-#             print(log)
-#         except:
-#             client.close()
-#             sys.exit(0)
-#
-# def send():
-#     while True:
-#         msg = input()
-#         clear()
-#         if(msg == "\quit"):
-#             client.close()
-#             sys.exit(0)
-#         client.send("[{}] {}: {}".format(datetime.now().strftime("%d/%m/%Y %H:%M:%S"), id, msg).encode("utf-8"))
-#
-# send()
-
 def limpaTela():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def recebeDados(client: socket.socket):
-    limpaTela()
-    print("Recebendo dados...")
     datajogo = client.recv(1024)
     datajogo = pickle.loads(datajogo)
     return datajogo
@@ -61,8 +33,6 @@ def recebeDados(client: socket.socket):
 def enviaDados(client: socket.socket, dados):
     dado_serializado = pickle.dumps(dados)
     client.send(dado_serializado)
-
-
 
 def imprimeTabuleiro(tabuleiro):
 
@@ -119,7 +89,7 @@ def imprimeStatus(tabuleiro, placar, vez):
         sys.stdout.write('\n')
         sys.stdout.write('\n')
 
-        print ("Vez do Jogador {0}.\n".format(vez + 1))
+        print (f"Vez do Jogador {vez + 1}.\n")
 
 def imprimePlacar(placar):
 
@@ -157,18 +127,81 @@ def leCoordenada(dim):
 
     return (i, j)
 
-def recebeID(client: socket.socket):
-    print("Pegando ID...")
-    identificacao = client.recv(1024)
-    identificacao = pickle.loads(identificacao)
-    return int(identificacao)
+def abrePeca(tabuleiro, i, j):
+
+    if tabuleiro[i][j] == '-':
+        return False
+    elif tabuleiro[i][j] < 0:
+        tabuleiro[i][j] = -tabuleiro[i][j]
+        # Envia para o servidor
+        return True
+
+    return False
+
+def renderiza(jogo):
+    pass
 
 def iniciaJogo(ID, user: socket.socket, jogo):
     while(jogo["paresEncontrados"] < jogo["numeroPares"]):
-        imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
         if jogo["vez"] == ID:
-            jogada = leCoordenada(jogo["dimensao"])
-            enviaDados(user, jogada)
+            # Lendo coordenada1
+            while True:
+                imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
+                coordenada1 = leCoordenada(jogo["dimensao"])
+
+                if coordenada1 == False:
+                    continue
+                
+                i1, j1 = coordenada1
+
+                if abrePeca(jogo["tabuleiro"], i1, j1) == False:
+                    print("Escolha uma peça ainda fechada!")
+                    input("Pressiona <enter para continuar...")
+                    continue
+
+                break
+
+            enviaDados(user, coordenada1)
+            # Lendo coordenada2
+            while True:
+                imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
+                coordenada2 = leCoordenada(jogo["dimensao"])
+
+                if coordenada2 == False:
+                    continue
+                
+                i2, j2 = coordenada2
+
+                if abrePeca(jogo["tabuleiro"], i2, j2) == False:
+                    print("Escolha uma peça ainda fechada!")
+                    input("Pressiona <enter para continuar...")
+                    continue
+
+                break
+
+            enviaDados(user, coordenada2)
+
+        imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
+        jogada, validadeJogada = recebeDados(user)
+
+        coordenada1, coordenada2 = jogada
+        x1, y1 = coordenada1
+        x2, y2 = coordenada2
+
+
+        imprimeStatus(jogo["tabuleiro"], jogo["placar"], jogo["vez"])
+        print(f"Peças escolhidas --> ({x1}, {y1}) e ({x2}, {y2})")
+        if validadeJogada == True:
+            print(f"Peças casam! Ponto para o jogador {jogo['vez']}")
+            time.sleep(5)
+        else:
+            print("Peças não casam!")
+            time.sleep(3)
+
+
+        jogo = recebeDados(user)
+
+
 
         
 
@@ -178,7 +211,8 @@ def main():
 
     limpaTela()
     print("Aguardando os jogadores se conectarem para o início do jogo")
-    # jogador recebe dados do jogo do servidor
+
+    # jogador recebe dados do jogo do servidor e um identificador
     jogo, identificador = recebeDados(client)
     print(jogo)
     print(identificador)
