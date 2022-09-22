@@ -224,10 +224,9 @@ def main():
 
         fechaConexao(users, server)
         
-    except Exception as e:
+    except:
         print("Saindo...")
         fechaConexao(users, server)
-        raise e
 
 if __name__ == "__main__":
     main()
