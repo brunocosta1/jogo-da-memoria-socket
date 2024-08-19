@@ -24,6 +24,7 @@ def conexaoJogadores(PORT, numeroJogadores):
     users: List[socket.socket] = []
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print("HOSTNAME:", socket.gethostname())
     server.bind((socket.gethostname(), PORT))
     server.listen(numeroJogadores)
     while len(users) < numeroJogadores:
@@ -227,6 +228,9 @@ def main():
     except:
         print("Saindo...")
         fechaConexao(users, server)
+    finally:
+        fechaConexao(users, server)
+
 
 if __name__ == "__main__":
     main()

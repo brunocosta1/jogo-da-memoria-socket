@@ -236,6 +236,9 @@ def main():
     except:
         print("Saindo...")
         client.close()
+    finally:
+        client.close()
+
 
 if __name__ == "__main__":
     main()
